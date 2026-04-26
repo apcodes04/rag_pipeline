@@ -1,0 +1,43 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+
+#ignore env api
+.env
+
+# Virtual environments
+.venv
+.venv-1
+
+# FAISS index (large binary files)
+faiss_store/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Environment variables
+.env
+
+# Jupyter checkpoints
+.ipynb_checkpoints/
+
+# uv
+.uv/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# VS Code
+.vscode/

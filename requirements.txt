@@ -1,0 +1,13 @@
+langchain
+langchain-core
+langchain-community ## data ingestion & chunking
+pypdf
+pymupdf
+ipynb
+scikit-learn
+ipykernel
+sentence-transformers ## embedding model
+faiss-cpu  ## vector db
+chromadb
+langchain-groq
+python-dotenv
