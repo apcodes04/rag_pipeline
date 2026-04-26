@@ -11,3 +11,4 @@ faiss-cpu  ## vector db
 chromadb
 langchain-groq
 python-dotenv
+Streamlit

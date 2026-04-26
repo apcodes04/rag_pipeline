@@ -165,6 +165,7 @@ scikit-learn
 python-dotenv
 ipykernel
 jupyter
+Streamlit
 ```
 
 'uv add -r requirements.txt' to add all the dependencies required for thr project.
@@ -177,6 +178,12 @@ jupyter
 - Rotate your Groq API key if accidentally exposed
 
 ---
+
+# Step 1 — Build index (first time or when adding new documents)
+uv run src/app.py
+
+# Step 2 — Launch Streamlit UI
+uv run streamlit run src/ui.py
 
 ## 📄 License
 
