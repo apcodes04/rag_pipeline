@@ -2,8 +2,7 @@ import os
 from dotenv import load_dotenv
 from src.vectorstore import FaissVectorStore
 from langchain_groq import ChatGroq
-from langchain_core.prompts import PromptTemplate
-from langchain_core.messages import HumanMessage, SystemMessage
+from langchain_core.messages import HumanMessage
 
 load_dotenv()
 
@@ -53,10 +52,3 @@ Answer:"""
         print(f"[INFO] Sending prompt to LLM...")
         response = self.llm.invoke([HumanMessage(content=prompt)])
         return response.content
-
-
-if __name__ == "__main__":
-    rag = RAGSearch()
-    query = "Kepler's 1st law?"
-    answer = rag.search_and_summarize(query, top_k=3)
-    print("Answer:", answer)
