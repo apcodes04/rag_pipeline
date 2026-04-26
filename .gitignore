@@ -41,3 +41,10 @@ Thumbs.db
 
 # VS Code
 .vscode/
+
+# Vector stores (large binary files)
+data/vector_store/
+faiss_store/
+*.sqlite3
+*.bin
+*.pickle
