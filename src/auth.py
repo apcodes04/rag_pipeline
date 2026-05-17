@@ -13,15 +13,14 @@ def get_oauth_client():
             client_secret=client_secret,
             authorize_endpoint="https://accounts.google.com/o/oauth2/auth",
             token_endpoint="https://oauth2.googleapis.com/token",
-            refresh_token_endpoint="https://oauth2.googleapis.com/token",
-            revoke_token_endpoint="https://oauth2.googleapis.com/revoke"
+            refresh_token_endpoint="https://oauth2.googleapis.com/token"
         )
         return oauth
 
     except Exception as e:
         st.error(f"❌ Auth setup failed: {e}")
         st.stop()
-
+        
 def show_login_page():
     st.markdown("""
     <style>
