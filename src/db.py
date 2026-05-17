@@ -5,8 +5,8 @@ import streamlit as st
 
 def get_supabase_client() -> Client:
     try:
-        url = os.getenv("SUPABASE_URL") or st.secrets["SUPABASE_URL"]
-        key = os.getenv("SUPABASE_KEY") or st.secrets["SUPABASE_KEY"]
+        url = st.secrets["SUPABASE_URL"]
+        key = st.secrets["SUPABASE_KEY"]
     except:
         url = os.getenv("SUPABASE_URL", "")
         key = os.getenv("SUPABASE_KEY", "")
