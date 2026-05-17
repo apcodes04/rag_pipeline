@@ -162,7 +162,7 @@ with st.sidebar:
         st.rerun()
 
     st.divider()
-    st.caption("Built with LangChain · FAISS · Groq 🚀")
+    st.caption("Built by ADITYA PAWAR 🚀 contact the developer here: adityabpawar.work@gmail.com or LinkedIn : www.linkedin.com/in/aditya-pawar-345908401")
 
 # ─── Building State — Show Progress + Facts ────────────────────
 if st.session_state.get("building", False):
