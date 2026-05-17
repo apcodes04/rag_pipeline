@@ -20,15 +20,15 @@ class RAGSearch:
         )
         print(f"[INFO] RAGSearch initialized with model: {model}")
 
-    def search_and_summarize(self, query: str, top_k: int = 3) -> str:
-        # Step 1 — retrieve relevant chunks
-        print(f"[INFO] Searching for: '{query}'")
+    def search_and_summarize(self, query: str, top_k: int = 20) -> str:
+        # Step 1 — retrieve maximum chunks for highest accuracy
+        print(f"[INFO] Searching for: '{query}' with top_k={top_k}")
         results = self.store.query(query, top_k=top_k)
 
         if not results:
             return "No relevant documents found."
 
-        # Step 2 — build context from retrieved chunks
+        # Step 2 — build context from all retrieved chunks
         context = "\n\n".join([
             r["metadata"]["text"]
             for r in results

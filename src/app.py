@@ -10,11 +10,10 @@ if __name__ == "__main__":
     data_dir = os.path.join(project_root, "data")
     faiss_dir = os.path.join(project_root, "faiss_store")
 
-    # Load documents
+    # Load and index documents from data/ folder
     docs = load_all_documents(data_dir)
     print(f"✅ Loaded {len(docs)} documents.")
 
-    # Build vector store
     store = FaissVectorStore(faiss_dir)
     store.build_from_documents(docs)
     print("✅ FAISS index built successfully!")
