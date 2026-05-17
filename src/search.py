@@ -4,7 +4,15 @@ from src.vectorstore import FaissVectorStore
 from langchain_groq import ChatGroq
 from langchain_core.messages import HumanMessage
 
+import streamlit as st
+from dotenv import load_dotenv
 load_dotenv()
+
+def get_api_key():
+    try:
+        return st.secrets["GROQ_API_KEY"]
+    except:
+        return os.getenv("GROQ_API_KEY")
 
 class RAGSearch:
     def __init__(
@@ -15,7 +23,7 @@ class RAGSearch:
         self.store = FaissVectorStore(persist_dir)
         self.store.load()
         self.llm = ChatGroq(
-            api_key=os.getenv("GROQ_API_KEY"),
+            api_key=get_api_key(),
             model=model
         )
         print(f"[INFO] RAGSearch initialized with model: {model}")
