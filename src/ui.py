@@ -11,8 +11,8 @@ from src.vectorstore import FaissVectorStore
 from src.search import RAGSearch
 from src.data_loader import load_all_documents
 from src.auth import get_authenticator, show_login_page
-from src.user_tracker import track_user, track_query, get_user_stats
-
+from src.db import track_user_login, track_query, get_user_stats
+from src.admin import show_admin_dashboard
 # ─── Page Config ───────────────────────────────────────────────
 st.set_page_config(
     page_title="RAG Pipeline — Chat with Your Docs",
@@ -36,7 +36,7 @@ user_name = user_info.get("name", "User")
 user_picture = user_info.get("picture", "")
 
 # Track this user
-track_user(user_info)
+track_user_login(user_info)
 user_stats = get_user_stats(user_email)
 
 # ─── Custom CSS ────────────────────────────────────────────────
@@ -328,7 +328,17 @@ if prompt := st.chat_input("Ask a question about your documents..."):
                 st.session_state.messages.append({"role": "assistant", "content": answer})
 
                 # Track query
-                track_query(user_email, prompt, tokens_used=len(prompt.split()) * 2)
+                track_query(
+    email=user_email,
+    query=prompt,
+    answer=answer,
+    tokens_used=len(prompt.split() + answer.split()) * 2
+)
 
             except Exception as e:
                 st.error(f"❌ Error: {e}")
+
+                
+
+# ─── Admin Dashboard (only visible to you) ─────────────────────
+show_admin_dashboard(user_email)
