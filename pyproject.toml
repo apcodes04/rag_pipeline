@@ -19,4 +19,5 @@ dependencies = [
     "scikit-learn>=1.8.0",
     "sentence-transformers>=5.4.1",
     "streamlit>=1.56.0",
+    "streamlit-google-auth>=1.1.8",
 ]
