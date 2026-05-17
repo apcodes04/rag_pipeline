@@ -4,40 +4,30 @@ from datetime import datetime
 import streamlit as st
 
 def get_supabase_client() -> Client:
-    url = (
-        os.getenv("SUPABASE_URL") or
-        st.secrets.get("SUPABASE_URL", "")
-    )
-    key = (
-        os.getenv("SUPABASE_KEY") or
-        st.secrets.get("SUPABASE_KEY", "")
-    )
+    try:
+        url = os.getenv("SUPABASE_URL") or st.secrets["SUPABASE_URL"]
+        key = os.getenv("SUPABASE_KEY") or st.secrets["SUPABASE_KEY"]
+    except:
+        url = os.getenv("SUPABASE_URL", "")
+        key = os.getenv("SUPABASE_KEY", "")
     return create_client(url, key)
 
-def track_user_login(user_info: dict):
+def track_user_login(email: str):
     """Save or update user on login"""
     try:
         supabase = get_supabase_client()
-        email = user_info.get("email", "")
         now = datetime.now().isoformat()
 
-        # Check if user exists
         existing = supabase.table("users").select("*").eq("email", email).execute()
 
         if existing.data:
-            # Update last login
             supabase.table("users").update({
-                "last_login": now,
-                "name": user_info.get("name", ""),
-                "picture": user_info.get("picture", "")
+                "last_login": now
             }).eq("email", email).execute()
             print(f"[INFO] Returning user: {email}")
         else:
-            # Insert new user
             supabase.table("users").insert({
                 "email": email,
-                "name": user_info.get("name", ""),
-                "picture": user_info.get("picture", ""),
                 "first_login": now,
                 "last_login": now,
                 "total_queries": 0,
@@ -53,7 +43,6 @@ def track_query(email: str, query: str, answer: str, tokens_used: int = 0):
     try:
         supabase = get_supabase_client()
 
-        # Insert query log
         supabase.table("queries").insert({
             "email": email,
             "query": query,
@@ -62,7 +51,6 @@ def track_query(email: str, query: str, answer: str, tokens_used: int = 0):
             "created_at": datetime.now().isoformat()
         }).execute()
 
-        # Update user totals
         existing = supabase.table("users").select("total_queries, total_tokens").eq("email", email).execute()
         if existing.data:
             current = existing.data[0]
