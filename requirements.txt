@@ -1,14 +1,14 @@
 langchain
 langchain-core
-langchain-community ## data ingestion & chunking
+langchain-community
+langchain-groq
+langchain-text-splitters
+sentence-transformers
+faiss-cpu
+chromadb
 pypdf
 pymupdf
-ipynb
+numpy
 scikit-learn
-ipykernel
-sentence-transformers ## embedding model
-faiss-cpu  ## vector db
-chromadb
-langchain-groq
 python-dotenv
-Streamlit
+streamlit
