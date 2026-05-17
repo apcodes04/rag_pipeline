@@ -48,3 +48,6 @@ faiss_store/
 *.sqlite3
 *.bin
 *.pickle
+
+
+google_credentials.json
