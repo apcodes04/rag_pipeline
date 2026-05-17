@@ -51,3 +51,4 @@ faiss_store/
 
 
 google_credentials.json
+".streamlit/secrets.toml" 

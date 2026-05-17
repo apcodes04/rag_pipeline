@@ -1,42 +1,22 @@
 import streamlit as st
 import os
-import json
-import tempfile
 
-def get_authenticator():
+def get_oauth_client():
     try:
-        from streamlit_google_auth import Authenticate
+        from streamlit_oauth import OAuth2Component
 
-        # Build credentials from secrets/env
-        credentials = {
-            "web": {
-                "client_id": os.getenv("GOOGLE_CLIENT_ID") or st.secrets.get("GOOGLE_CLIENT_ID", ""),
-                "client_secret": os.getenv("GOOGLE_CLIENT_SECRET") or st.secrets.get("GOOGLE_CLIENT_SECRET", ""),
-                "redirect_uris": [
-                    os.getenv("REDIRECT_URI") or st.secrets.get("REDIRECT_URI", "http://localhost:8501")
-                ],
-                "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-                "token_uri": "https://oauth2.googleapis.com/token"
-            }
-        }
+        client_id = os.getenv("GOOGLE_CLIENT_ID") or st.secrets.get("GOOGLE_CLIENT_ID", "")
+        client_secret = os.getenv("GOOGLE_CLIENT_SECRET") or st.secrets.get("GOOGLE_CLIENT_SECRET", "")
 
-        # Write credentials to a temp file
-        tmp = tempfile.NamedTemporaryFile(
-            mode="w",
-            suffix=".json",
-            delete=False
+        oauth = OAuth2Component(
+            client_id=client_id,
+            client_secret=client_secret,
+            authorize_endpoint="https://accounts.google.com/o/oauth2/auth",
+            token_endpoint="https://oauth2.googleapis.com/token",
+            refresh_token_endpoint="https://oauth2.googleapis.com/token",
+            revoke_token_endpoint="https://oauth2.googleapis.com/revoke"
         )
-        json.dump(credentials, tmp)
-        tmp.flush()
-
-        authenticator = Authenticate(
-            secret_credentials_path=tmp.name,
-            redirect_uri=os.getenv("REDIRECT_URI") or st.secrets.get("REDIRECT_URI", "http://localhost:8501"),
-            cookie_name="rag_pipeline_auth",
-            cookie_key=os.getenv("COOKIE_SECRET") or st.secrets.get("COOKIE_SECRET", "ragyt-secret-2026"),
-            cookie_expiry_days=30.0
-        )
-        return authenticator
+        return oauth
 
     except Exception as e:
         st.error(f"❌ Auth setup failed: {e}")

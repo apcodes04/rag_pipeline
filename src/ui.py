@@ -10,9 +10,11 @@ import random
 from src.vectorstore import FaissVectorStore
 from src.search import RAGSearch
 from src.data_loader import load_all_documents
-from src.auth import get_authenticator, show_login_page
-from src.db import track_user_login, track_query, get_user_stats
 from src.admin import show_admin_dashboard
+from src.auth import get_oauth_client, show_login_page
+from src.db import track_user_login, track_query, get_user_stats
+import base64
+import json
 # ─── Page Config ───────────────────────────────────────────────
 st.set_page_config(
     page_title="RAG Pipeline — Chat with Your Docs",
@@ -21,22 +23,42 @@ st.set_page_config(
 )
 
 # ─── Auth ──────────────────────────────────────────────────────
-authenticator = get_authenticator()
-authenticator.check_authentification()
+REDIRECT_URI = os.getenv("REDIRECT_URI") or st.secrets.get("REDIRECT_URI", "http://localhost:8501")
 
-if not st.session_state.get("connected", False):
+if "user_email" not in st.session_state:
     show_login_page()
-    authenticator.login()
+    oauth = get_oauth_client()
+
+    result = oauth.authorize_button(
+        name="Sign in with Google",
+        icon="https://www.google.com/favicon.ico",
+        redirect_uri=REDIRECT_URI,
+        scope="openid email profile",
+        key="google_login",
+        extras_params={"prompt": "consent", "access_type": "offline"}
+    )
+
+    if result and "token" in result:
+        id_token = result["token"].get("id_token", "")
+        try:
+            payload = id_token.split(".")[1]
+            payload += "=" * (4 - len(payload) % 4)
+            user_data = json.loads(base64.b64decode(payload).decode("utf-8"))
+            st.session_state.user_email = user_data.get("email", "")
+            st.session_state.user_name = user_data.get("name", "User")
+            st.session_state.user_picture = user_data.get("picture", "")
+            st.rerun()
+        except Exception as e:
+            st.error(f"❌ Failed to decode user info: {e}")
     st.stop()
 
 # ─── User is logged in ─────────────────────────────────────────
-user_info = st.session_state.get("user_info", {})
-user_email = user_info.get("email", "unknown")
-user_name = user_info.get("name", "User")
-user_picture = user_info.get("picture", "")
+user_email = st.session_state.get("user_email", "")
+user_name = st.session_state.get("user_name", "User")
+user_picture = st.session_state.get("user_picture", "")
 
-# Track this user
-track_user_login(user_info)
+# Track user login
+track_user_login(user_email)
 user_stats = get_user_stats(user_email)
 
 # ─── Custom CSS ────────────────────────────────────────────────
@@ -141,7 +163,9 @@ with st.sidebar:
 
     # Logout
     if st.button("🚪 Logout", use_container_width=True):
-        authenticator.logout()
+        for key in ["user_email", "user_name", "user_picture", "rag", "messages"]:
+            if key in st.session_state:
+                del st.session_state[key]
         st.rerun()
 
     st.divider()
@@ -329,11 +353,11 @@ if prompt := st.chat_input("Ask a question about your documents..."):
 
                 # Track query
                 track_query(
-    email=user_email,
-    query=prompt,
-    answer=answer,
-    tokens_used=len(prompt.split() + answer.split()) * 2
-)
+                    email=user_email,
+                    query=prompt,
+                    answer=answer,
+                    tokens_used=len(prompt.split() + answer.split()) * 2
+                )
 
             except Exception as e:
                 st.error(f"❌ Error: {e}")
