@@ -1,3 +1,14 @@
+---
+title: RAG Pipeline
+emoji: 🚀
+colorFrom: blue
+colorTo: green
+sdk: streamlit
+sdk_version: 1.45.0
+app_file: src/ui.py
+pinned: false
+---
+
 # RAG Pipeline — Retrieval-Augmented Generation System
 
 A modular, end-to-end RAG pipeline built with Python, LangChain, FAISS, and Groq LLaMA 3.1. This system ingests multi-format documents, generates semantic embeddings, stores them in a FAISS vector index, and answers natural language queries using an LLM.
