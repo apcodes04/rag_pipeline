@@ -17,26 +17,35 @@ import base64
 import json
 # ─── Page Config ───────────────────────────────────────────────
 st.set_page_config(
-    page_title="RAG Pipeline — Chat with Your Docs",
-    page_icon="🧠",
+    page_title="STUDY BUDDY — Chat with Your Docs",
+    page_icon="🧠📚",
     layout="centered"
 )
 
 # ─── Auth ──────────────────────────────────────────────────────
-REDIRECT_URI = os.getenv("REDIRECT_URI") or st.secrets.get("REDIRECT_URI", "http://localhost:8501")
+REDIRECT_URI = "https://apcodes-rag-pipeline.hf.space/component/streamlit_oauth.authorize_button/index.html"
 
 if "user_email" not in st.session_state:
     show_login_page()
     oauth = get_oauth_client()
 
-    result = oauth.authorize_button(
-        name="Sign in with Google",
-        icon="https://www.google.com/favicon.ico",
-        redirect_uri=REDIRECT_URI,
-        scope="openid email profile",
-        key="google_login",
-        extras_params={"prompt": "consent", "access_type": "offline"}
-    )
+    try:
+        result = oauth.authorize_button(
+            name="Sign in with Google",
+            icon="https://www.google.com/favicon.ico",
+            redirect_uri=REDIRECT_URI,
+            scope="openid email profile",
+            key="google_login",
+            extras_params={"prompt": "consent", "access_type": "offline"},
+            use_container_width=True,
+        )
+    except Exception as e:
+        # State mismatch — clear and reload so user can try again
+        st.warning("⚠️ Session expired. Please click Sign in again.")
+        for key in list(st.session_state.keys()):
+            del st.session_state[key]
+        st.rerun()
+        result = None
 
     if result and "token" in result:
         id_token = result["token"].get("id_token", "")
@@ -51,7 +60,7 @@ if "user_email" not in st.session_state:
         except Exception as e:
             st.error(f"❌ Failed to decode user info: {e}")
     st.stop()
-
+    
 # ─── User is logged in ─────────────────────────────────────────
 user_email = st.session_state.get("user_email", "")
 user_name = st.session_state.get("user_name", "User")
@@ -147,7 +156,7 @@ faiss_dir = os.path.join(project_root, "faiss_store", user_email.replace("@", "_
 faiss_index_path = os.path.join(faiss_dir, "faiss.index")
 
 # ─── Header ────────────────────────────────────────────────────
-st.markdown('<p class="main-title">🧠 RAG Pipeline</p>', unsafe_allow_html=True)
+st.markdown('<p class="main-title">STUDY BUDDY — Chat with Your Docs 🧠📚 A RAG PIPELINE</p>', unsafe_allow_html=True)
 st.markdown('<p class="subtitle">Upload your documents and ask anything — zero hallucinations!</p>', unsafe_allow_html=True)
 
 # ─── Sidebar ───────────────────────────────────────────────────
@@ -170,11 +179,11 @@ with st.sidebar:
 
     st.divider()
     st.markdown("### 📁 Upload Documents")
-    st.caption("Supported: PDF, TXT, CSV, DOCX, XLSX, JSON")
+    st.caption("Supported: PDF, TXT, DOCX, JSON")
 
     uploaded_files = st.file_uploader(
         "Choose your files",
-        type=["pdf", "txt", "csv", "docx", "xlsx", "json"],
+        type=["pdf", "txt", "csv", "docx", "json"],
         accept_multiple_files=True,
         label_visibility="collapsed"
     )
@@ -203,7 +212,7 @@ with st.sidebar:
     - 📋 **XLSX**
     - 📃 **DOCX**
     - 🗂️ **JSON**
-    """)
+    """"")
 
     st.divider()
     if st.button("🗑️ Clear Chat History", use_container_width=True):
@@ -211,7 +220,7 @@ with st.sidebar:
         st.rerun()
 
     st.divider()
-    st.caption("Built by ADITYA PAWAR 🚀 contact the developer here: adityabpawar.work@gmail.com or LinkedIn : www.linkedin.com/in/aditya-pawar-345908401")
+    st.caption("Built by ADITYA PAWAR 🚀 contact the developer here: Website: www.adityapawar.in or Email to: adityabpawar.work@gmail.com")
 
 # ─── Building State ────────────────────────────────────────────
 if st.session_state.get("building", False):
